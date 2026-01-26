@@ -73,6 +73,8 @@ export default {
 		layoutLinkView: 'Link View',
 		layoutIframeViewOne: 'Iframe View One',
 		layoutIframeViewTwo: 'Iframe View Two',
+		seckillList: 'Seckill Goods',
+		seckillDetail: 'Goods Detail',
 	},
 	staticRoutes: {
 		login: 'Login',

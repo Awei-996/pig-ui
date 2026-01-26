@@ -56,6 +56,19 @@ export const dynamicRoutes: Array<RouteRecordRaw> = [
 			isHide: true,
 		},
 	},
+	{
+		path: '/seckill/detail',
+		name: 'router.seckillDetail',
+		component: () => import('/@/views/seckill/list/detail/index.vue'),
+		meta: {
+			isLink: '',
+			isHide: true,
+			isKeepAlive: false,
+			isAffix: false,
+			isIframe: false,
+			title: '商品详情',
+		},
+	},
 ];
 
 /**

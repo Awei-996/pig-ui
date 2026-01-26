@@ -66,6 +66,8 @@ export default {
 		layoutLinkView: '外链',
 		layoutIframeViewOne: '内嵌 iframe1',
 		layoutIframeViewTwo: '内嵌 iframe2',
+		seckillList: '秒杀商品',
+		seckillDetail: '商品详情',
 	},
 	staticRoutes: {
 		login: '登录',
