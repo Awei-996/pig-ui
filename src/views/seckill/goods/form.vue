@@ -86,6 +86,17 @@
 						></el-date-picker>
 					</el-form-item>
 				</el-col>
+				<el-col :span="12">
+					<el-form-item :label="$t('goods.endTime')" prop="endTime">
+						<el-date-picker
+							v-model="state.ruleForm.endTime"
+							type="datetime"
+							value-format="YYYY-MM-DD HH:mm:ss"
+							placeholder="请选择商品结束时间"
+							style="width: 100%"
+						></el-date-picker>
+					</el-form-item>
+				</el-col>
 			</el-row>
 			<el-form-item :label="$t('goods.canBook')" prop="canBook">
 				<el-radio-group v-model="state.ruleForm.canBook">
@@ -159,13 +170,13 @@ const state = reactive({
 		quantity: 0,
 		detail: '',
 		saleableInventory: 0,
-		identifier: '',
 		occupiedInventory: 0,
 		frozenInventory: 0,
 		saleTime: '',
 		syncChainTime: '',
 		bookStartTime: '',
 		bookEndTime: '',
+		endTime: '',
 		canBook: 0,
 		creatorId: '',
 		version: 0,

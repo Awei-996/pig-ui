@@ -98,7 +98,7 @@ export const rejectGoods = (id: string | number) => {
 /**
  * 获取防重提交token
  */
-export const getToken = (scene: string, key: string | number) => {
+export const getToken = (scene: string, key: string) => {
 	return request({
 		url: '/seckill/goods/token/get',
 		method: 'get',
