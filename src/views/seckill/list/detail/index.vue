@@ -112,7 +112,7 @@
 <script setup lang="ts" name="seckillDetail">
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { info } from '/@/api/seckill/goods';
+import { info, getToken } from '/@/api/seckill/goods';
 import { useDict } from '/@/hooks/dict';
 import { useMessage } from '/@/hooks/message';
 import { Picture, ArrowLeft } from '@element-plus/icons-vue';
@@ -124,6 +124,7 @@ const router = useRouter();
 // 响应式数据
 const loading = ref(false);
 const goodsInfo = ref<any>(null);
+const submitToken = ref<string>('');
 
 // 定义字典
 const { goods_category } = useDict('goods_category');
@@ -159,11 +160,21 @@ const getGoodsDetail = async () => {
 		return;
 	}
 
-	try {
+	// 处理 id 类型，确保是 string 或 number
+	const goodsId = Array.isArray(id) ? id[0] : id;
+	if (!goodsId) {
+		useMessage().error('商品ID不能为空');
+		router.back();
+		return;
+	}
+
+		try {
 		loading.value = true;
-		const res = await info(id);
+		const res = await info(goodsId);
 		if (res.code === 0 && res.data) {
 			goodsInfo.value = res.data;
+			// 获取商品详情成功后，生成防重提交token
+			await generateSubmitToken();
 		} else {
 			useMessage().error('获取商品详情失败');
 			router.back();
@@ -173,6 +184,30 @@ const getGoodsDetail = async () => {
 		router.back();
 	} finally {
 		loading.value = false;
+	}
+};
+
+// 生成防重提交token
+const generateSubmitToken = async () => {
+	if (!goodsInfo.value?.id) {
+		console.warn('商品ID不存在，无法生成token');
+		return;
+	}
+	
+	try {
+		// 根据商品类目判断商品类型，默认为实物商品（PHYSICAL）
+		// 如果商品类目是虚拟商品相关，则使用 VIRTUAL
+		// 这里可以根据实际业务需求调整判断逻辑
+		const scene = goodsInfo.value.classId === 'nft' ? 'VIRTUAL' : 'PHYSICAL';
+		
+		const res = await getToken(scene, goodsInfo.value.id);
+		if (res.code === 0 && res.data) {
+			submitToken.value = res.data;
+		} else {
+			console.warn('生成防重提交token失败：', res.msg || '未知错误');
+		}
+	} catch (error: any) {
+		console.warn('生成防重提交token失败：', error.msg || error.message || '未知错误');
 	}
 };
 

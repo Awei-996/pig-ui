@@ -94,3 +94,17 @@ export const rejectGoods = (id: string | number) => {
 		method: 'put',
 	});
 };
+
+/**
+ * 获取防重提交token
+ */
+export const getToken = (scene: string, key: string | number) => {
+	return request({
+		url: '/seckill/goods/token/get',
+		method: 'get',
+		params: {
+			scene,
+			key,
+		},
+	});
+};
