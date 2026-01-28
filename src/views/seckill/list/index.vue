@@ -28,7 +28,7 @@
 				:key="goods.id"
 				class="goods-card"
 				shadow="hover"
-				@click="goToDetail(goods.id)"
+				@click="handleCardClick(goods)"
 			>
 				<div class="goods-image-wrapper">
 					<el-image
@@ -60,12 +60,12 @@
 						</span>
 					</div>
 					<el-button
-						type="primary"
+						:type="getButtonInfo(goods).type"
 						class="goods-button"
-						:disabled="goods.state !== 'ON_SALE'"
-						@click.stop="goToDetail(goods.id)"
+						:disabled="getButtonInfo(goods).disabled"
+						@click.stop="handleCardClick(goods)"
 					>
-						{{ goods.state === 'ON_SALE' ? '立即抢购' : '查看详情' }}
+						{{ getButtonInfo(goods).text }}
 					</el-button>
 				</div>
 			</el-card>
@@ -115,6 +115,63 @@ const formatTime = (time: string) => {
 	});
 };
 
+// 判断是否可以抢购（售卖时间已到、活动未结束、库存大于0）
+const canPurchase = (goods: any) => {
+	// 判断售卖时间是否已到
+	if (goods.saleTime) {
+		const saleTime = new Date(goods.saleTime).getTime();
+		const now = new Date().getTime();
+		if (now < saleTime) {
+			return false; // 还未到售卖时间
+		}
+	}
+
+	// 判断活动是否已结束
+	if (goods.endTime) {
+		const endTime = new Date(goods.endTime).getTime();
+		const now = new Date().getTime();
+		if (now > endTime) {
+			return false; // 活动已结束
+		}
+	}
+
+	// 判断库存是否大于0
+	if (!goods.quantity || goods.quantity <= 0) {
+		return false; // 库存为0
+	}
+
+	return true;
+};
+
+// 获取按钮文本和状态
+const getButtonInfo = (goods: any) => {
+	// 如果活动已结束
+	if (goods.endTime) {
+		const endTime = new Date(goods.endTime).getTime();
+		const now = new Date().getTime();
+		if (now > endTime) {
+			return { text: '活动已结束', disabled: true, type: 'info' };
+		}
+	}
+
+	// 如果库存为0
+	if (!goods.quantity || goods.quantity <= 0) {
+		return { text: '已售罄', disabled: true, type: 'info' };
+	}
+
+	// 如果还未到售卖时间
+	if (goods.saleTime) {
+		const saleTime = new Date(goods.saleTime).getTime();
+		const now = new Date().getTime();
+		if (now < saleTime) {
+			return { text: '未开抢', disabled: true, type: 'info' };
+		}
+	}
+
+	// 可以抢购
+	return { text: '立即抢购', disabled: false, type: 'primary' };
+};
+
 // 获取商品列表
 const getGoodsList = async () => {
 	try {
@@ -156,6 +213,15 @@ const handleSizeChange = (size: number) => {
 const handlePageChange = (page: number) => {
 	currentPage.value = page;
 	getGoodsList();
+};
+
+// 处理卡片点击事件
+const handleCardClick = (goods: any) => {
+	// 如果可以抢购，才允许进入详情
+	if (!canPurchase(goods)) {
+		return;
+	}
+	goToDetail(goods.id);
 };
 
 // 跳转到详情页
